@@ -1,0 +1,47 @@
+<html>
+<script src="vtt.js"></script>
+<style>
+    .dragover {
+        background-color: #444;
+        transition: background-color 0.4s ease;
+    }
+
+    #transcript {
+        /*white-space: pre-wrap;*/
+    }
+</style>
+<body>
+<div id="transcript"></div>
+</body>
+<script>
+    var transcriptEl = document.getElementById('transcript');
+
+    window.addEventListener('dragover', onDragOver);
+    window.addEventListener('drop', onDrop);
+
+    function preventDefault(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    }
+
+    function onDragOver(e) {
+        document.body.classList.add('dragover');
+        preventDefault(e);
+    }
+
+    function onFileReaderLoad(e){
+        transcriptEl.innerHTML = VTT.process(e.target.result);
+    }
+
+    function onDrop(e) {
+        document.body.classList.remove('dragover');
+        preventDefault(e);
+
+        var reader = new FileReader();
+        var file = e.dataTransfer.files[0];
+        reader.onload = onFileReaderLoad;
+        reader.readAsText(file);
+    }
+</script>
+</html>
