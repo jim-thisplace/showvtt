@@ -2,21 +2,34 @@
 <script src="vtt.js"></script>
 <style>
     .dragover {
-        background-color: #444;
-        transition: background-color 0.4s ease;
+        background-color : #444;
+        transition       : background-color 0.4s ease;
     }
 
     #transcript {
-        /*white-space: pre-wrap;*/
+        white-space    : pre-wrap;
+        line-height    : 1.5em;
+        font-size      : 1.2em;
+        min-height     : 100%;
+        min-width      : 100%;
+    }
+
+    #transcript:empty::before {
+        content:'Drag and drop your .VTT file to extract text.';
     }
 </style>
 <body>
+<h1 id="title"></h1>
 <div id="transcript"></div>
 </body>
 <script>
+    var RE_REPLACE_YOUTUBE_DL_EXT = /-[0-9a-zA-Z_]{11}.en.vtt$/;
+
+    var titleEl      = document.getElementById('title');
     var transcriptEl = document.getElementById('transcript');
 
     window.addEventListener('dragover', onDragOver);
+    window.addEventListener('dragleave', onDragLeave);
     window.addEventListener('drop', onDrop);
 
     function preventDefault(e) {
@@ -25,13 +38,19 @@
         e.stopImmediatePropagation();
     }
 
+    function onDragLeave(e) {
+        document.body.classList.remove('dragover');
+        preventDefault(e);
+    }
+
     function onDragOver(e) {
         document.body.classList.add('dragover');
         preventDefault(e);
     }
 
-    function onFileReaderLoad(e){
-        transcriptEl.innerHTML = VTT.process(e.target.result);
+    function onFileReaderLoad(e) {
+        var lines              = VTT.process(e.target.result);
+        transcriptEl.innerHTML = lines.join(' ');
     }
 
     function onDrop(e) {
@@ -39,7 +58,10 @@
         preventDefault(e);
 
         var reader = new FileReader();
-        var file = e.dataTransfer.files[0];
+        var file   = e.dataTransfer.files[0];
+
+        titleEl.innerText = file.name.replace(RE_REPLACE_YOUTUBE_DL_EXT, '');
+
         reader.onload = onFileReaderLoad;
         reader.readAsText(file);
     }

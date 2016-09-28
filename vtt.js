@@ -110,7 +110,7 @@
      * @returns {undefined|string}
      */
     function removeForwardPartialDuplicates(line, i, a) {
-        if (a[i + 1] && a[i + 1].match(line)) {
+        if (a[i + 1] && a[i + 1].trim() === line.trim()) {
         } else {
             return line;
         }
@@ -118,7 +118,7 @@
 
     /**
      * @param {string} text
-     * @returns {string}
+     * @returns {string[]}
      */
     function process(text) {
         resetState();
@@ -133,7 +133,7 @@
             .map(removeForwardPartialDuplicates)
             .filter(Boolean);
 
-        return lines.join('\n');
+        return lines;
     }
 
     /** @namespace */
